@@ -9,8 +9,9 @@ router.register('register', views.RegisterView)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('login', views.CustomAuthToken.as_view()),
-    path('auth', obtain_auth_token),
+    path('login/', views.CustomAuthToken.as_view()),
+    path('logout/', views.LogoutUserView.as_view(), name='logout'),
+    path('like/', views.LikeView.as_view(), name='like'),
 ]
 
 

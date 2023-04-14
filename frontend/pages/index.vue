@@ -51,8 +51,16 @@
           <ion-menu-button></ion-menu-button>
         </ion-buttons>
         <ion-buttons slot="end">
-          <ion-button  @click="presentAlert">Register</ion-button>
-          <ion-button  >Login</ion-button>
+          <div v-if="token != null">
+            <ion-button  @click="logOut()">logout</ion-button>
+
+          </div>
+          <div v-else>
+            <ion-button @click="loginAlert">Login</ion-button>
+            <ion-button  @click="presentAlert">Register</ion-button>
+
+          </div>
+
           <ion-alert trigger="present-alert" header="Please enter your info" :buttons="alertButtons" :inputs="alertInputs"></ion-alert>
         </ion-buttons>
         <ion-title>Meta</ion-title>
@@ -75,7 +83,7 @@
 
           <ion-grid style="width:100%">
           <ion-row class="ion-justify-content-center">
-            <ion-col class="ion-justify-content-center"><ion-button id="open-toast">Like</ion-button></ion-col>
+            <ion-col class="ion-justify-content-center"><ion-button id="open-toast" @click="likePost()">Like</ion-button></ion-col>
             <ion-col > <ion-button id="open-toast">comment</ion-button></ion-col>
             <ion-col > <ion-button id="open-toast">Open </ion-button></ion-col>
           </ion-row>
@@ -96,9 +104,20 @@
 
 <script setup>
   import { IonButton, alertController } from '@ionic/vue';
+  import { Preferences } from '@capacitor/preferences';
 
   const all_data = ref('')
-  // const alert = ref('')
+  const token = ref('')
+  const username = ref('')
+
+
+async function logOut(){
+  await useFetch('http://127.0.0.1:8000/logout/')
+  .then((response)=>{
+    console.log(response.data.value.Message)
+  })
+  removeName()
+}
 
 
 async function getData(){
@@ -107,7 +126,7 @@ async function getData(){
         all_data.value = response.data.value
       })
     }
-    getData()
+getData()
 
     let modal = document.querySelector('ion-modal');
 
@@ -122,61 +141,8 @@ function confirm() {
   modal.dismiss(input.value, 'confirm');
 }
 
-// modal.addEventListener('willDismiss', (ev) => {
-//   if (ev.detail.role === 'confirm') {
-//     const message = document.querySelector('#message');
-//     message.textContent = `Hello ${ev.detail.data}!`;
-//   }
-// });
 
 const alertButtons = ['Submit'];
-// const alertInputs = [
-//   {
-//     placeholder: 'Name',
-//   },
-//   {
-//     placeholder: 'Nickname (max 8 characters)',
-//     attributes: {
-//       maxlength: 8,
-//     },
-//   },
-//   {
-//     type: 'number',
-//     placeholder: 'Age',
-//     min: 1,
-//     max: 100,
-//   },
-//   {
-//     type: 'textarea',
-//     placeholder: 'A little about yourself',
-//   },
-// ];
-
-
-// const alertInputs =  alertController.create({
-//     inputs: [
-//     {
-//         name: 'name1',
-//         type: 'text'
-//     }],    
-//     buttons: [
-//         {
-//             text: 'Cancel',
-//             role: 'cancel',
-//             cssClass: 'secondary',
-//             handler: () => {
-//                 console.log('Confirm Cancel');
-//             }
-//         }, 
-//         {
-//             text: 'Ok',
-//             handler: (alertData) => { //takes the data 
-//                 console.log(alertData.name1);
-//             }
-//         }
-//     ]
-// });
-
 
 
 const presentAlert = async () => {
@@ -230,6 +196,110 @@ const presentAlert = async () => {
 
         await alert.present();
       };
+
+const loginAlert = async () => {
+      const alert = await alertController.create({
+          inputs: [
+                {
+                    name: 'username',
+                    placeholder: 'Enter username',
+                    type: 'text'
+                },
+                {
+                    name: 'password',
+                    placeholder: 'Enter password',
+                    type: 'password'
+                },
+              
+              ],
+          header: 'Login Form',
+          message: 'Enter User details',
+          buttons: [
+        {
+            text: 'Cancel',
+            role: 'cancel',
+            // cssClass: 'danger',
+            handler: () => {
+                console.log('Confirm Cancel');
+            }
+        }, 
+        {
+            text: 'Submit',
+            handler: (alertData) => { //takes the data 
+                console.log(alertData);
+                async function postData(){
+                  await useFetch('http://127.0.0.1:8000/login/', {
+                    method: 'POST',
+                    body: alertData
+                  }).then((response)=>{
+                    console.log(response.data.value)
+                    username.value = response.data.value.username
+                    getData()
+
+                    const auth_token = response.data.value.data.token
+
+
+                    // SET DATA IN CAPACITOR
+                    async function setObject() {
+                      await Preferences.set({
+                        key: 'token',
+                        value: JSON.stringify(auth_token)
+                        // value: JSON.stringify({
+                        //   id: 1,
+                        //   name: auth_token
+                        // })
+                      });
+                    }
+                    setObject()
+
+                      // JSON "get" example
+                      // async function getObject() {
+                      //   const ret = await Preferences.get({ key: 'token' });
+                      //   const user = JSON.parse(ret.value);
+                      //   console.log(user)
+                      // }
+                      // getObject()
+              })
+                }
+                postData()
+            }
+        }
+    ]
+        });
+
+        await alert.present();
+      };
+
+
+//CLEAR TOKEN FROM CAPACITOR
+async function removeName(){
+  await Preferences.remove({ key: 'token' });
+};
+
+
+// GET TOKEN DATA FROM CAPACITOR 
+async function getObject() {
+  const ret = await Preferences.get({ key: 'token' });
+  const user = JSON.parse(ret.value);
+  console.log(user)
+  token.value = user
+
+}
+getObject()
+
+
+
+async function likePost(){
+  await useFetch('http://127.0.0.1:8000/like/')
+      .then((response)=>{
+        console.log(response.data.value)
+      })
+  }
+
+
+
+
+
 
 </script>
 

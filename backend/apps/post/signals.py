@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 @receiver(post_save, sender=User)
 def create_auth_token(sender, instance, created, **kwargs):
     if created:
-        print(instance)
+        # print(instance)
         Token.objects.create(user=instance)
 
 

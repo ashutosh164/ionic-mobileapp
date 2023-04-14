@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Posts
+from .models import Posts, Like, Comment
 # from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 
@@ -23,6 +23,18 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
+
+
+class LikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Like
+        fields = '__all__'
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = '__all__'
 
 
 

@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate
 from django.shortcuts import render
 from rest_framework.views import APIView
 from .models import Posts
-from .serializer import PostSerializer, RegisterSerializer
+from .serializer import PostSerializer, RegisterSerializer, LikeSerializer, CommentSerializer
 from rest_framework import viewsets, status
 from django.contrib.auth.models import User
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -10,7 +10,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from .models import Like
+from .models import Like, Comment
 
 
 class PostView(viewsets.ModelViewSet):
@@ -61,26 +61,36 @@ class LogoutUserView(APIView):
         return response
 
 
-class LikeView(APIView):
-    def post(self, request):
-        user = request.user
-        print(user)
-        post_id = request.POST.get('post_id')
-        post_obj = Posts.objects.get(id=post_id)
-        if user in post_obj.liked.all():
-            post_obj.liked.remove(user)
-        else:
-            post_obj.liked.add(user)
-        like, created = Like.objects.get_or_create(user=user, post_id=post_id)
+# class LikeView(APIView):
+#     def post(self, request):
+#         user = request.user
+#         print(user)
+#         post_id = request.POST.get('post_id')
+#         post_obj = Posts.objects.get(id=post_id)
+#         if user in post_obj.liked.all():
+#             post_obj.liked.remove(user)
+#         else:
+#             post_obj.liked.add(user)
+#         like, created = Like.objects.get_or_create(user=user, post_id=post_id)
+#
+#         if not created:
+#             if like.value == 'Like':
+#                 like.value = 'Unlike'
+#             else:
+#                 like.value = 'Like'
+#
+#         like.save()
+#         return Response(data=like, status=status.HTTP_200_OK)
 
-        if not created:
-            if like.value == 'Like':
-                like.value = 'Unlike'
-            else:
-                like.value = 'Like'
 
-        like.save()
-        return Response(data=like, status=status.HTTP_200_OK)
+class LikeView(viewsets.ModelViewSet):
+    serializer_class = LikeSerializer
+    queryset = Like.objects.all()
+
+
+class CommentView(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    queryset = Comment.objects.all()
 
 
 

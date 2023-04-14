@@ -67,6 +67,26 @@
       </ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding">
+      
+
+
+    <div v-if="user_id">
+      <ion-card>
+          <ion-card-header>
+            <ion-card-subtitle>            
+              <ion-input class="input" label="Post you thought...." label-placement="floating" fill="outline" ></ion-input>
+            </ion-card-subtitle>
+          </ion-card-header>
+
+          <ion-card-content>
+            <ion-icon :icon="logoIonic" size="large" color="primary"></ion-icon>
+            <!-- <ion-icon :icon="logoIonic"></ion-icon>
+            <ion-icon :icon="logoIonic" size="large"></ion-icon>
+            <ion-icon :icon="logoIonic" color="primary"></ion-icon>
+            <ion-icon :icon="logoIonic" size="large" color="primary"></ion-icon> -->
+          </ion-card-content>
+      </ion-card>
+    </div>
 
 
 
@@ -83,9 +103,9 @@
 
           <ion-grid style="width:100%">
           <ion-row class="ion-justify-content-center">
-            <ion-col class="ion-justify-content-center"><ion-button id="open-toast" @click="likePost()">Like</ion-button></ion-col>
-            <ion-col > <ion-button id="open-toast">comment</ion-button></ion-col>
-            <ion-col > <ion-button id="open-toast">Open </ion-button></ion-col>
+            <ion-col class="ion-justify-content-center"><ion-button id="open-toast" @click="likePost(data.id)">Like</ion-button></ion-col>
+            <ion-col > <ion-button id="open-toast" @click="commentAlert(data.id)">comment</ion-button></ion-col>
+            <ion-col > <ion-button id="open-toast" @click="unlikePost(data.id)">Unlike </ion-button></ion-col>
           </ion-row>
         </ion-grid>
         </ion-card-content>
@@ -109,6 +129,7 @@
   const all_data = ref('')
   const token = ref('')
   const username = ref('')
+  const user_id = ref('')
 
 
 async function logOut(){
@@ -232,9 +253,9 @@ const loginAlert = async () => {
                     method: 'POST',
                     body: alertData
                   }).then((response)=>{
-                    console.log(response.data.value)
+                    console.log(response.data.value.data.user_id)
                     username.value = response.data.value.username
-                    getData()
+                    // getData()
 
                     const auth_token = response.data.value.data.token
 
@@ -243,11 +264,12 @@ const loginAlert = async () => {
                     async function setObject() {
                       await Preferences.set({
                         key: 'token',
-                        value: JSON.stringify(auth_token)
-                        // value: JSON.stringify({
-                        //   id: 1,
-                        //   name: auth_token
-                        // })
+                        // value: JSON.stringify(auth_token),
+                        // id: response.data.value.data.user_id
+                        value: JSON.stringify({
+                          id: response.data.value.data.user_id,
+                          token_id: auth_token
+                        })
                       });
                     }
                     setObject()
@@ -270,6 +292,54 @@ const loginAlert = async () => {
         await alert.present();
       };
 
+async function commentAlert(post_id){
+  const alert = await alertController.create({
+    inputs: [
+          {
+              name: 'body',
+              placeholder: 'Write a comment..',
+              type: 'textarea'
+          }   
+        ],
+    // header: 'Leave your thought here',
+    message: 'Leave your thought here',
+    buttons: [
+  {
+      text: 'Cancel',
+      role: 'cancel',
+      // cssClass: 'danger',
+      handler: () => {
+          console.log('Confirm Cancel');
+      }
+  }, 
+  {
+      text: 'Submit',
+      handler: (alertData) => { //takes the data 
+          async function postData(){
+            console.log(post_id)
+            console.log(user_id.value)
+            // console.log(alertData[0])
+            // console.log(alertData)
+            let formData = new FormData();
+            formData.append('body',alertData['body'])
+            formData.append('user', user_id.value)
+            formData.append('post', post_id)
+
+            await useFetch('http://127.0.0.1:8000/comment/', {
+              method: 'POST',
+              body: formData
+            }).then((response)=>{
+              console.log(response)
+            })
+          }
+          postData()
+      }
+  }
+]
+  });
+
+  await alert.present();
+};
 
 //CLEAR TOKEN FROM CAPACITOR
 async function removeName(){
@@ -281,21 +351,43 @@ async function removeName(){
 async function getObject() {
   const ret = await Preferences.get({ key: 'token' });
   const user = JSON.parse(ret.value);
-  console.log(user)
-  token.value = user
+  if (user != null){
+    token.value = user.token_id
+    user_id.value = user.id
+  }else{token.value = null}
+  // console.log(user.id)
 
 }
 getObject()
 
 
 
-async function likePost(){
-  await useFetch('http://127.0.0.1:8000/like/')
+async function likePost(post_id){
+  let formData = new FormData();
+  formData.append('user', user_id.value)
+  formData.append('post', post_id)
+  await useFetch('http://127.0.0.1:8000/like/', {
+    method: 'POST',
+    body: formData
+  })
       .then((response)=>{
         console.log(response.data.value)
       })
   }
 
+  async function unlikePost(post_id){
+  let formData = new FormData();
+  formData.append('user', user_id.value)
+  formData.append('post', post_id)
+  formData.append('value', 'Unlike')
+  await useFetch('http://127.0.0.1:8000/like/', {
+    method: 'POST',
+    body: formData
+  })
+      .then((response)=>{
+        console.log(response.data.value)
+      })
+  }  
 
 
 
@@ -305,6 +397,43 @@ async function likePost(){
 
 
 <style>
+.input{
+  background-color: var(--color-realbox-background);
+    border: none;
+    border-radius: var(--ntp-realbox-border-radius);
+    color: var(--color-realbox-foreground);
+    font-family: inherit;
+    font-size: inherit;
+    height: 100%;
+    outline: 0;
+    padding-inline-end: calc(var(--ntp-realbox-voice-icon-offset) + var(--ntp-realbox-icon-width) + var(--ntp-realbox-inner-icon-margin));
+    padding-inline-start: 52px;
+    position: relative;
+    width: 100%;
+}
+
+
+/* ion-input.custom {
+    --background: #fffff;
+    --color: #000000;
+    --placeholder-color: #ddd;
+    --placeholder-opacity: .8;
+
+    --padding-bottom: 10px;
+    --padding-end: 10px;
+    --padding-start: 10px;
+    --padding-top: 10px;
+    border-radius: 4px;
+  }
+  
+  ion-input.custom .helper-text,
+  ion-input.custom .counter {
+    color: var(--ion-color-step-700, #373737);
+  } */
+
+
+
+
   ion-segment-button::part(indicator-background) {
     background: #08a391;
   }

@@ -44,15 +44,25 @@
 
     </ion-content>
   </ion-menu>
+
+  
   <ion-page id="main-content">
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-menu-button></ion-menu-button>
+          <ion-menu-button>
+            <span class="relative inline-block">
+                <img class="h-6 w-6 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
+                <span class="absolute right-0 top-0 block h-1.5 w-1.5 rounded-full bg-green-400 ring-2 ring-white" />
+            </span>
+
+          </ion-menu-button>
         </ion-buttons>
         <ion-buttons slot="end">
           <div v-if="token != null">
-            <ion-button  @click="logOut()">logout</ion-button>
+            <ion-button  @click="logOut()">
+              <Icon name="heroicons-outline:logout" class="-ml-1 mr-2 h-5 w-5 green" style="color: red;" aria-hidden="true"/>
+              </ion-button>
 
           </div>
           <div v-else>
@@ -73,13 +83,21 @@
     <div v-if="user_id">
       <ion-card>
           <ion-card-header>
+            <span class="relative inline-block">
+              <img class="h-10 w-10 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
+              <span class="absolute bottom-0 left-8 block h-2.5 w-2.5 rounded-full bg-green-400 ring-2 ring-white" />
+            </span>
             <ion-card-subtitle>            
-              <ion-input class="input" label="Post you thought...." label-placement="floating" fill="outline" ></ion-input>
+              <ion-input class="input" label="What's happening?" label-placement="floating" fill="outline" ></ion-input>
             </ion-card-subtitle>
           </ion-card-header>
 
           <ion-card-content>
-            <ion-icon :icon="logoIonic" size="large" color="primary"></ion-icon>
+            <ion-button>Tweet</ion-button>
+            <!-- <ion-icon name="heart"></ion-icon> -->
+            <ion-icon :icon="create"></ion-icon>
+            <!-- <ion-icon slot="icon-only" :ios="ellipsisHorizontal" :md="ellipsisVertical"></ion-icon> -->
+
             <!-- <ion-icon :icon="logoIonic"></ion-icon>
             <ion-icon :icon="logoIonic" size="large"></ion-icon>
             <ion-icon :icon="logoIonic" color="primary"></ion-icon>
@@ -94,8 +112,11 @@
         <ion-card-header>
 
           <ion-card-title>{{ data.title }}</ion-card-title>
-          <ion-card-subtitle>{{ data.desc }}</ion-card-subtitle>
+          <ion-card-subtitle>{{ data.author }}</ion-card-subtitle>
         </ion-card-header>
+       
+
+
 
 
         <ion-card-content>
@@ -103,9 +124,71 @@
 
           <ion-grid style="width:100%">
           <ion-row class="ion-justify-content-center">
-            <ion-col class="ion-justify-content-center"><ion-button id="open-toast" @click="likePost(data.id)">Like</ion-button></ion-col>
-            <ion-col > <ion-button id="open-toast" @click="commentAlert(data.id)">comment</ion-button></ion-col>
-            <ion-col > <ion-button id="open-toast" @click="unlikePost(data.id)">Unlike </ion-button></ion-col>
+            <!-- <ion-col class="ion-justify-content-center"><ion-button id="open-toast" @click="likePost(data.id)">Like</ion-button></ion-col> -->
+            <!-- <ion-col > <ion-button id="open-toast" @click="commentAlert(data.id)">comment</ion-button></ion-col> -->
+            <!-- <ion-col > <ion-button id="open-toast" @click="unlikePost(data.id)">Unlike </ion-button></ion-col> -->
+            <!-- <ion-col class="ion-justify-content-center"><ion-icon :icon="heart" @click="likePost(data.id)"></ion-icon></ion-col> -->
+            <!-- <Icon name="heroicons-outline:heart" class="-ml-1 mr-2 h-5 w-5"  aria-hidden="true"/> -->
+            <!-- <span class="relative flex h-4 w-4 mt-1">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-4 w-4 bg-sky-500 "></span>
+              </span> -->
+              <ion-col class="ion-justify-content-center mt-8">     
+                <div @click="likePost(data.id)" class="rotate-45 ion-justify-content-center">
+                <span class="heart animate-heart mt-2 absolute inline-flex" ></span>
+                <!-- <spam class="heart animate-ping mt-2 absolute inline-flex"></spam> -->
+                
+              </div></ion-col>
+              <!-- <Icon name="heroicons-outline:heart" class="-ml-1 mr-2 h-5 w-5"  aria-hidden="true"/> -->
+
+              <div class="heartless mt-4 ml-1 " @click="likePost(data.id)" ></div>
+
+<!-- HTML -->
+<!-- HTML -->
+<!-- <button class="flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">
+  <svg class="h-5 w-5 animate-like" fill="currentColor" viewBox="0 0 20 20">
+    <path d="M10 18l8-5.5V5A2 2 0 0 0 16 3H5.83A2 2 0 0 0 5 3.5L2 5v8l3-1.5V5.35l5 3.5-5 3.5V14l5-3.5L10 18z"></path>
+  </svg>
+  <span class="hidden md:inline">Like</span>
+</button> -->
+
+
+
+
+              <!-- <div class="rotate-45 ion-justify-content-center">
+                <span class="heart animate-heart mt-2 absolute inline-flex" ></span>
+                <spam class="heart animate-ping mt-2 absolute inline-flex"></spam>
+              </div> -->
+
+
+
+
+              <!-- <span class="relative flex h-4 w-4 mt-1">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                    <div class="heart animate-ping"></div>
+                </span> -->
+   
+
+              <!-- <span class="relative flex h-4 w-4 mt-1">
+              <span class="relative  w-[100px] h-[90px] animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75
+                before:content-[''] before:absolute before:top-0 before:left-[50px]
+                before:h-[80px] before:w-[50px] before:rounded-t-[50px] 
+                before:rounded-r-[50px]before:rounded-b-0 before:rounded-l-0 
+                before:bg-black before:-rotate-45 before:origin-[0_100%]
+
+                after:content-[''] after:absolute after:top-0 after:left-0 after:h-[80px]
+                after:w-[50px] after:rounded-t-[50px] after:rounded-r-[50px] 
+                after:rounded-b-0 after:rounded-l-0 after:bg-black after:rotate-45
+                after:origin-[100%_100%] relative inline-flex rounded-full h-4 w-4 bg-sky-500
+                ">
+                </span>
+              </span> -->
+       
+
+
+
+            <ion-col class="ion-justify-content-center"><ion-icon :icon="create"  @click="commentAlert(data.id)"></ion-icon></ion-col>
+            <ion-col class="ion-justify-content-center"><ion-icon :icon="thumbsDown"  @click="unlikePost(data.id)"></ion-icon></ion-col>
           </ion-row>
         </ion-grid>
         </ion-card-content>
@@ -125,7 +208,8 @@
 <script setup>
   import { IonButton, alertController } from '@ionic/vue';
   import { Preferences } from '@capacitor/preferences';
-
+  // import { create, ellipsisHorizontal, ellipsisVertical, helpCircle, personCircle, search, star } from 'ionicons/icons';
+import { create, heart, thumbsDown} from 'ionicons/icons';
   const all_data = ref('')
   const token = ref('')
   const username = ref('')
@@ -144,6 +228,7 @@ async function logOut(){
 async function getData(){
       await useFetch('http://127.0.0.1:8000/posts/')
       .then((response)=>{
+        console.log(response.data.value)
         all_data.value = response.data.value
       })
     }
@@ -316,11 +401,8 @@ async function commentAlert(post_id){
       text: 'Submit',
       handler: (alertData) => { //takes the data 
           async function postData(){
-            console.log(post_id)
-            console.log(user_id.value)
-            // console.log(alertData[0])
-            // console.log(alertData)
             let formData = new FormData();
+            if(alertData['body'] != ''){
             formData.append('body',alertData['body'])
             formData.append('user', user_id.value)
             formData.append('post', post_id)
@@ -331,6 +413,7 @@ async function commentAlert(post_id){
             }).then((response)=>{
               console.log(response)
             })
+          }
           }
           postData()
       }
@@ -375,19 +458,21 @@ async function likePost(post_id){
       })
   }
 
-  async function unlikePost(post_id){
-  let formData = new FormData();
-  formData.append('user', user_id.value)
-  formData.append('post', post_id)
-  formData.append('value', 'Unlike')
-  await useFetch('http://127.0.0.1:8000/like/', {
-    method: 'POST',
-    body: formData
-  })
-      .then((response)=>{
-        console.log(response.data.value)
-      })
-  }  
+async function unlikePost(post_id){
+let formData = new FormData();
+formData.append('user', user_id.value)
+formData.append('post', post_id)
+formData.append('value', 'Unlike')
+await useFetch('http://127.0.0.1:8000/like/', {
+  method: 'POST',
+  body: formData
+})
+    .then((response)=>{
+      console.log(response.data)
+
+      console.log(response.data.value)
+    })
+}  
 
 
 
@@ -396,7 +481,94 @@ async function likePost(post_id){
 </script>
 
 
+
 <style>
+.heart {
+  width: 15px;
+  height: 15px;
+  background-color: #f00; /* red color for heart shape */
+  position: absolute;
+  transform: rotate(45deg); /* rotate the heart shape */
+}
+
+.heart:before,
+.heart:after {
+  content: '';
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  background-color: #f00; /* red color for heart shape */
+  border-radius: 50%;
+}
+
+.heart:before {
+  top: -10px; /* position the top half of the heart */
+  left: 0;
+}
+
+.heart:after {
+  top: 0; /* position the bottom half of the heart */
+  left: -10px;
+}
+
+/* Animation classes */
+.animate-heart {
+  animation: beat 1s infinite;
+
+}
+
+@keyframes beat {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+
+
+
+
+.heartless {
+  width: 15px;
+  height: 15px;
+  background-color: rgb(184, 194, 188); 
+  position: absolute;
+  transform: rotate(45deg);
+  border-color: #f10808;
+
+}
+
+.heartless:before,
+.heartless:after {
+  content: '';
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  background-color: rgb(184, 194, 188); 
+  border-radius: 50%;
+  /* border-color: #f10808; */
+}
+
+.heartless:before {
+  top: -10px; /* position the top half of the heart */
+  left: 0;
+
+}
+
+.heartless:after {
+  top: 0; /* position the bottom half of the heart */
+  left: -10px;
+
+}
+
+
+
+
 .input{
   background-color: var(--color-realbox-background);
     border: none;
@@ -411,6 +583,37 @@ async function likePost(post_id){
     position: relative;
     width: 100%;
 }
+
+
+
+
+/* CSS */
+
+@keyframes like {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-like:hover {
+  animation: like 0.5s ease-in-out infinite;
+}
+
+
+
+
+
+
+
+
+
+
 
 
 /* ion-input.custom {

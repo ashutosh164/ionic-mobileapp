@@ -8,9 +8,13 @@ class Posts(models.Model):
     desc = models.CharField(max_length=250, blank=True, null=True)
     image = models.ImageField(blank=True, null=True)
     liked = models.ManyToManyField(User, default=None, blank=True, related_name='liked')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return self.title
+
+    def num_like(self):
+        return self.liked.all().count()
 
 
 LIKE_CHOICES = (
@@ -32,7 +36,7 @@ class Like(models.Model):
 class Comment(models.Model):
     objects = models.Manager()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey(Posts, on_delete=models.CASCADE)
+    post = models.ForeignKey(Posts, on_delete=models.CASCADE, related_name='comments')
     body = models.CharField(max_length=250, blank=True, null=True)
     updated_on = models.DateTimeField(auto_now_add=True)
     created_on = models.DateTimeField(auto_now_add=True)

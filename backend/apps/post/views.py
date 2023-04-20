@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from .models import Like, Comment
+from django.db.models import Q
 
 
 class PostView(viewsets.ModelViewSet):
@@ -86,6 +87,44 @@ class LogoutUserView(APIView):
 class LikeView(viewsets.ModelViewSet):
     serializer_class = LikeSerializer
     queryset = Like.objects.all()
+
+    # def create(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     # print(serializer.get('user'))
+    #     print(serializer)
+#
+#         self.perform_create(serializer)
+#         print(serializer.data)
+#         print(serializer.data.get('user'))
+#         print(serializer.data.get('post'))
+#         print(serializer.data.get('value'))
+#         user_id = serializer.data.get('user')
+#         post_id = serializer.data.get('post')
+#         all_like = Like.objects.all().count()
+#         post_obj = Posts.objects.get(id=post_id)
+#         print(post_obj)
+#         # print(all_like)
+#         filter_post_in_like = Like.objects.filter(Q(post_id=post_id) & Q(user_id=user_id)).values('value').exists()
+#         print(filter_post_in_like)
+#         # if filter_post_in_like:
+#
+#
+#         # current_post = Posts.objects.get(id=post_id)
+#         # if user_id in current_post.liked.all():
+#
+#         # print(current_post.liked.filter(id=user_id).exists())
+#         # print(Like.objects.filter(user_id=user_id))
+#         # if user_id in current_post.liked.all():
+#
+#         #     print('yes')
+#         # else:
+#         #     print('no')
+#
+#
+#
+#
+        # return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class CommentView(viewsets.ModelViewSet):

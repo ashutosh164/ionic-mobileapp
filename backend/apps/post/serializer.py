@@ -67,12 +67,12 @@ class LikeSerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     # like = LikeSerializer(many=True, required=False)
-    value = serializers.CharField(source='liked.value', read_only=True, required=False)
+    # value = serializers.CharField(source='liked.value', read_only=True, required=False)
 
     class Meta:
         model = Posts
-        # fields = '__all__'
-        fields = ['id', 'title', 'desc', 'image', 'liked', 'author', 'value']
+        fields = '__all__'
+        # fields = ['id', 'title', 'desc', 'image', 'liked', 'author', 'value']
 
 
 class CommentSerializer(serializers.ModelSerializer):

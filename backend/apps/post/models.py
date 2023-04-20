@@ -30,7 +30,7 @@ class Like(models.Model):
     value = models.CharField(choices=LIKE_CHOICES, default='Like', max_length=10)
 
     def __str__(self):
-        return f'{self.user}--{self.post}--{self.value}'
+        return self.value
 
 
 class Comment(models.Model):

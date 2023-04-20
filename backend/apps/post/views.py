@@ -20,6 +20,10 @@ class PostView(viewsets.ModelViewSet):
     # authentication_classes = [TokenAuthentication]
     # permission_classes = [IsAuthenticated]
 
+    # def get_queryset(self):
+    #     queryset = super(PostView, self).get_queryset()
+    #     pass
+
 
 class RegisterView(viewsets.ModelViewSet):
     serializer_class = RegisterSerializer
@@ -60,28 +64,6 @@ class LogoutUserView(APIView):
             'Message': "Logged Out Successfully"
         }
         return response
-
-
-# class LikeView(APIView):
-#     def post(self, request):
-#         user = request.user
-#         print(user)
-#         post_id = request.POST.get('post_id')
-#         post_obj = Posts.objects.get(id=post_id)
-#         if user in post_obj.liked.all():
-#             post_obj.liked.remove(user)
-#         else:
-#             post_obj.liked.add(user)
-#         like, created = Like.objects.get_or_create(user=user, post_id=post_id)
-#
-#         if not created:
-#             if like.value == 'Like':
-#                 like.value = 'Unlike'
-#             else:
-#                 like.value = 'Like'
-#
-#         like.save()
-#         return Response(data=like, status=status.HTTP_200_OK)
 
 
 class LikeView(viewsets.ModelViewSet):

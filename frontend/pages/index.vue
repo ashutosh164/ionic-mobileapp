@@ -81,38 +81,57 @@
 
 
     <div v-if="user_id">
-      <ion-card>
-          <ion-card-header>
-            <span class="relative inline-block">
-              <img class="h-10 w-10 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
-              <span class="absolute bottom-0 left-8 block h-2.5 w-2.5 rounded-full bg-green-400 ring-2 ring-white" />
-            </span>
-            <ion-card-subtitle>            
-              <ion-input class="input" label="What's happening?" label-placement="floating" fill="outline" ></ion-input>
-            </ion-card-subtitle>
-          </ion-card-header>
+      <ion-card>{{ current_username }}
+        <ion-grid>
+          <ion-row>
+            <ion-col >
+                <span class="relative inline-block">
+                  <img class="h-10 w-10 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
+                </span>
+            </ion-col>
+            <ion-col size="10">
 
-          <ion-card-content>
-            <ion-button>Tweet</ion-button>
-            <!-- <ion-icon name="heart"></ion-icon> -->
-            <ion-icon :icon="create"></ion-icon>
-            <!-- <ion-icon slot="icon-only" :ios="ellipsisHorizontal" :md="ellipsisVertical"></ion-icon> -->
+              <ion-row>
+                <ion-input class="input" label="What's happening?" label-placement="floating" fill="outline" ></ion-input>
+              </ion-row>
+              <ion-row>
+                <ion-col size="1"><ion-icon class="h-6 w-6" :icon="image"></ion-icon></ion-col>
+                <ion-col size="7"><ion-icon class="h-6 w-6 ml-2" :icon="image"></ion-icon></ion-col>
+                <ion-col size="1"><ion-button class="h-6 w-16 font-semibold">Tweet</ion-button></ion-col>
 
-            <!-- <ion-icon :icon="logoIonic"></ion-icon>
-            <ion-icon :icon="logoIonic" size="large"></ion-icon>
-            <ion-icon :icon="logoIonic" color="primary"></ion-icon>
-            <ion-icon :icon="logoIonic" size="large" color="primary"></ion-icon> -->
-          </ion-card-content>
+              </ion-row>
+
+            </ion-col>
+            <!-- <ion-col >3</ion-col> -->
+          </ion-row>
+          <!-- <ion-row>sfga</ion-row> -->
+        </ion-grid>
+
       </ion-card>
     </div>
 
 
 
       <ion-card v-for="data in all_data" :key="data.id">
+        <ion-grid>
+          <ion-row>
+            <ion-col >
+                <span class="relative inline-block">
+                  <img class="h-12 w-12 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
+                </span>
+            </ion-col>
+            <ion-col size="10">
+              <ion-row>{{data.author}}</ion-row>
+              <ion-row>User Bio</ion-row>
+              <ion-row>Thursday, 20 April 2023, Public</ion-row>
+            </ion-col>
+            <!-- <ion-col>3</ion-col> -->
+          </ion-row>
+        </ion-grid>
         <ion-card-header>
 
           <ion-card-title>{{ data.title }}</ion-card-title>
-          <ion-card-subtitle>{{ data.author }}</ion-card-subtitle>
+          <ion-card-subtitle>{{ data.liked.length }}</ion-card-subtitle>
         </ion-card-header>
        
 
@@ -124,71 +143,35 @@
 
           <ion-grid style="width:100%">
           <ion-row class="ion-justify-content-center">
-            <!-- <ion-col class="ion-justify-content-center"><ion-button id="open-toast" @click="likePost(data.id)">Like</ion-button></ion-col> -->
-            <!-- <ion-col > <ion-button id="open-toast" @click="commentAlert(data.id)">comment</ion-button></ion-col> -->
-            <!-- <ion-col > <ion-button id="open-toast" @click="unlikePost(data.id)">Unlike </ion-button></ion-col> -->
-            <!-- <ion-col class="ion-justify-content-center"><ion-icon :icon="heart" @click="likePost(data.id)"></ion-icon></ion-col> -->
-            <!-- <Icon name="heroicons-outline:heart" class="-ml-1 mr-2 h-5 w-5"  aria-hidden="true"/> -->
-            <!-- <span class="relative flex h-4 w-4 mt-1">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-4 w-4 bg-sky-500 "></span>
-              </span> -->
-              <ion-col class="ion-justify-content-center mt-8">     
-                <div @click="likePost(data.id)" class="rotate-45 ion-justify-content-center">
-                <span class="heart animate-heart mt-2 absolute inline-flex" ></span>
+
+              <ion-col v-if="data.liked.length && token != null" class="ion-justify-content-center">     
+                <!-- <span @click="likePost(data.id)" class="rotate-45 "> -->
+                <span @click="likePost(data.id)" class="heart animate-heart mt-2" ></span>
                 <!-- <spam class="heart animate-ping mt-2 absolute inline-flex"></spam> -->
                 
-              </div></ion-col>
-              <!-- <Icon name="heroicons-outline:heart" class="-ml-1 mr-2 h-5 w-5"  aria-hidden="true"/> -->
+                <!-- </span> -->
+            </ion-col>
+            <ion-col v-else class="ion-justify-content-center mt-2">     
+              <span class="heartless absolute inline-flex" @click="likePost(data.id)" ></span>
+              <!-- <Icon   @click="unlikePost(data.id)" class="mt-3 rotate-45 heartless"   aria-hidden="true" /> -->
 
-              <div class="heartless mt-4 ml-1 " @click="likePost(data.id)" ></div>
 
-<!-- HTML -->
-<!-- HTML -->
-<!-- <button class="flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">
-  <svg class="h-5 w-5 animate-like" fill="currentColor" viewBox="0 0 20 20">
-    <path d="M10 18l8-5.5V5A2 2 0 0 0 16 3H5.83A2 2 0 0 0 5 3.5L2 5v8l3-1.5V5.35l5 3.5-5 3.5V14l5-3.5L10 18z"></path>
-  </svg>
-  <span class="hidden md:inline">Like</span>
-</button> -->
+            </ion-col>
+              <!-- <Icon name="heroicons-outline:chat-bubble-bottom-center" class="-ml-1 mr-2 h-5 w-5"  aria-hidden="true"/> -->
 
 
 
 
-              <!-- <div class="rotate-45 ion-justify-content-center">
-                <span class="heart animate-heart mt-2 absolute inline-flex" ></span>
-                <spam class="heart animate-ping mt-2 absolute inline-flex"></spam>
-              </div> -->
-
-
-
-
-              <!-- <span class="relative flex h-4 w-4 mt-1">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-                    <div class="heart animate-ping"></div>
-                </span> -->
-   
-
-              <!-- <span class="relative flex h-4 w-4 mt-1">
-              <span class="relative  w-[100px] h-[90px] animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75
-                before:content-[''] before:absolute before:top-0 before:left-[50px]
-                before:h-[80px] before:w-[50px] before:rounded-t-[50px] 
-                before:rounded-r-[50px]before:rounded-b-0 before:rounded-l-0 
-                before:bg-black before:-rotate-45 before:origin-[0_100%]
-
-                after:content-[''] after:absolute after:top-0 after:left-0 after:h-[80px]
-                after:w-[50px] after:rounded-t-[50px] after:rounded-r-[50px] 
-                after:rounded-b-0 after:rounded-l-0 after:bg-black after:rotate-45
-                after:origin-[100%_100%] relative inline-flex rounded-full h-4 w-4 bg-sky-500
-                ">
-                </span>
-              </span> -->
-       
-
-
-
-            <ion-col class="ion-justify-content-center"><ion-icon :icon="create"  @click="commentAlert(data.id)"></ion-icon></ion-col>
-            <ion-col class="ion-justify-content-center"><ion-icon :icon="thumbsDown"  @click="unlikePost(data.id)"></ion-icon></ion-col>
+            <ion-col class="ion-justify-content-center">
+              <!-- <ion-icon :icon="create"  @click="commentAlert(data.id)"></ion-icon> -->
+              <Icon name="heroicons-outline:chat-bubble-bottom-center" @click="commentAlert(data.id)" class="-ml-1 mr-2 h-7 w-7"   aria-hidden="true" />
+            </ion-col>
+            <ion-col class="ion-justify-content-center">
+                <Icon name="heroicons-outline:paper-airplane"  @click="unlikePost(data.id)" class="-ml-1 mr-2 h-7 w-7 rotate-45"   aria-hidden="true" />
+            </ion-col>
+            <ion-col class="ion-justify-content-center">
+                <Icon name="heroicons:arrow-path-rounded-square-20-solid"  class="-ml-1 mr-2 h-7 w-7"   aria-hidden="true" />
+            </ion-col>
           </ion-row>
         </ion-grid>
         </ion-card-content>
@@ -206,20 +189,28 @@
 </template>
 
 <script setup>
-  import { IonButton, alertController } from '@ionic/vue';
+  import { IonButton, alertController, toastController } from '@ionic/vue';
   import { Preferences } from '@capacitor/preferences';
+  import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+  import { ActionSheet, ActionSheetButtonStyle } from '@capacitor/action-sheet';
+
   // import { create, ellipsisHorizontal, ellipsisVertical, helpCircle, personCircle, search, star } from 'ionicons/icons';
-import { create, heart, thumbsDown} from 'ionicons/icons';
+import { create, heart, thumbsDown, document, image} from 'ionicons/icons';
   const all_data = ref('')
   const token = ref('')
   const username = ref('')
   const user_id = ref('')
+  const current_username = ref('')
 
 
 async function logOut(){
   await useFetch('http://127.0.0.1:8000/logout/')
   .then((response)=>{
     console.log(response.data.value.Message)
+    if(response.data.value.Message){
+      LogoutToast('top')
+      token.value = null
+    }
   })
   removeName()
 }
@@ -234,7 +225,7 @@ async function getData(){
     }
 getData()
 
-    let modal = document.querySelector('ion-modal');
+    // let modal = document.querySelector('ion-modal');
 
     // console.log(modal)
 
@@ -338,9 +329,13 @@ const loginAlert = async () => {
                     method: 'POST',
                     body: alertData
                   }).then((response)=>{
-                    console.log(response.data.value.data.user_id)
-                    username.value = response.data.value.username
-                    // getData()
+                    // console.log(response.data.value.data.user_id)
+                    if(response.data.value){
+                      presentToastLogin('top')
+                    }
+                    current_username.value = response.data.value.data.username
+                    console.log(response.data.value.data.username)
+                    getData()
 
                     const auth_token = response.data.value.data.token
 
@@ -353,7 +348,8 @@ const loginAlert = async () => {
                         // id: response.data.value.data.user_id
                         value: JSON.stringify({
                           id: response.data.value.data.user_id,
-                          token_id: auth_token
+                          token_id: auth_token,
+                          current_username:response.data.value.data.username
                         })
                       });
                     }
@@ -376,6 +372,26 @@ const loginAlert = async () => {
 
         await alert.present();
       };
+
+async function presentToastLogin(position) {
+    const toast = await toastController.create({
+      message: 'Login successfull!!',
+      duration: 1500,
+      position: position
+    });
+
+    await toast.present();
+  } 
+
+  async function LogoutToast(position) {
+    const toast = await toastController.create({
+      message: 'Logout successfull!!',
+      duration: 1500,
+      position: position
+    });
+
+    await toast.present();
+  } 
 
 async function commentAlert(post_id){
   const alert = await alertController.create({
@@ -434,9 +450,11 @@ async function removeName(){
 async function getObject() {
   const ret = await Preferences.get({ key: 'token' });
   const user = JSON.parse(ret.value);
+  console.log(user)
   if (user != null){
     token.value = user.token_id
     user_id.value = user.id
+    current_username.value = user.current_username
   }else{token.value = null}
   // console.log(user.id)
 
@@ -474,9 +492,35 @@ await useFetch('http://127.0.0.1:8000/like/', {
     })
 }  
 
+async function writeSecretFile(){
+  await Filesystem.writeFile({
+    path: 'secrets/text.txt',
+    data: "This is a test",
+    directory: Directory.Documents,
+    encoding: Encoding.UTF8,
+  });
+};
 
+async function showActions()  {
+  const result = await ActionSheet.showActions({
+    title: 'Photo Options',
+    message: 'Select an option to perform',
+    options: [
+      {
+        title: 'Upload',
+      },
+      {
+        title: 'Share',
+      },
+      {
+        title: 'Remove',
+        style: ActionSheetButtonStyle.Destructive,
+      },
+    ],
+  });
 
-
+  console.log('Action Sheet result:', result);
+};
 
 </script>
 
@@ -488,7 +532,7 @@ await useFetch('http://127.0.0.1:8000/like/', {
   height: 15px;
   background-color: #f00; /* red color for heart shape */
   position: absolute;
-  transform: rotate(45deg); /* rotate the heart shape */
+  transform: rotate(45deg); 
 }
 
 .heart:before,
@@ -513,19 +557,21 @@ await useFetch('http://127.0.0.1:8000/like/', {
 
 /* Animation classes */
 .animate-heart {
-  animation: beat 1s infinite;
+  animation: beat 1s infinite ;
+  /* position: absolute;
+  transform: rotate(45deg); */
 
 }
 
 @keyframes beat {
   0% {
-    transform: scale(1);
+    transform: scale(0.8)rotate(45deg);
   }
   50% {
-    transform: scale(1.2);
+    transform: scale(1)rotate(45deg);
   }
   100% {
-    transform: scale(1);
+    transform: scale(0.8) rotate(45deg);
   }
 }
 

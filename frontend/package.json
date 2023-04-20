@@ -17,9 +17,11 @@
     "tailwindcss": "^3.3.1"
   },
   "dependencies": {
+    "@capacitor/action-sheet": "^4.1.0",
     "@capacitor/android": "4.7.3",
     "@capacitor/app": "4.1.1",
     "@capacitor/core": "4.7.3",
+    "@capacitor/filesystem": "^4.1.4",
     "@capacitor/haptics": "4.1.0",
     "@capacitor/ios": "4.7.3",
     "@capacitor/keyboard": "4.1.1",
@@ -28,9 +30,8 @@
     "@headlessui/vue": "^1.7.13",
     "@nuxtjs/tailwindcss": "^6.6.6",
     "autoprefixer": "^10.4.14",
+    "nuxt-icon": "^0.2.11",
     "nuxt-icons": "^3.1.0",
-    "postcss": "^8.4.22",
-    "nuxt-icon": "^0.2.11"
-
+    "postcss": "^8.4.22"
   }
 }

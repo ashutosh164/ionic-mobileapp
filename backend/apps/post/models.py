@@ -1,14 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import User
+# from apps.account.models import Profiles
 
 
 class Posts(models.Model):
     objects = models.Manager()
-    title = models.CharField(max_length=250, blank=True, null=True)
-    desc = models.CharField(max_length=250, blank=True, null=True)
-    image = models.ImageField(blank=True, null=True)
+    title = models.CharField(max_length=500, blank=True, null=True)
+    image = models.ImageField(blank=True, null=True, upload_to='post')
     liked = models.ManyToManyField(User, default=None, blank=True, related_name='liked')
     author = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    updated_on = models.DateTimeField(auto_now=True)
+    created_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.title
@@ -43,4 +45,8 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.body
+
+
+
+
 

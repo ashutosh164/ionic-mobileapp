@@ -4,6 +4,8 @@ from .models import Posts, Like, Comment
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 User = get_user_model()
+from apps.account.models import Profiles
+from rest_framework.response import Response
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -27,12 +29,9 @@ class LikeSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         # data = validated_data.get('user')
-        print(validated_data)
         # user = self.context['request'].user
         user = validated_data.get('user')
         post = validated_data.get('post')
-        print(post.id)
-        print(post.author.id)
         if user in post.liked.all():
             post.liked.remove(user)
         else:
@@ -65,14 +64,29 @@ class LikeSerializer(serializers.ModelSerializer):
         # return like
 
 
+# class ProfileSerializer(serializers.ModelSerializer):
+#     user = RegisterSerializer()
+#
+#     class Meta:
+#         model = Profiles
+#         fields = '__all__'
+
+
 class PostSerializer(serializers.ModelSerializer):
     # like = LikeSerializer(many=True, required=False)
     # value = serializers.CharField(source='liked.value', read_only=True, required=False)
+    user_name = serializers.CharField(source='author.username', read_only=True, required=False)
+    profiles = serializers.SerializerMethodField('get_profile_by_author_of_the_post')
+
+    def get_profile_by_author_of_the_post(self, instance):
+        response = Profiles.objects.filter(post_id=instance.id).values()
+        print(response)
+        return response
 
     class Meta:
         model = Posts
         fields = '__all__'
-        # fields = ['id', 'title', 'desc', 'image', 'liked', 'author', 'value']
+        # fields = ['id', 'title', 'desc', 'image', 'liked', 'author', 'user_name', 'profiles']
 
 
 class CommentSerializer(serializers.ModelSerializer):

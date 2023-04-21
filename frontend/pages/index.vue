@@ -120,16 +120,16 @@
                   <img class="h-12 w-12 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
                 </span>
             </ion-col>
-            <ion-col size="10">
-              <ion-row>{{data.author}}</ion-row>
-              <ion-row>User Bio</ion-row>
-              <ion-row>Thursday, 20 April 2023, Public</ion-row>
+            <ion-col class="user-info" size="10">
+              <ion-row class="user-name font-bold" >{{data.user_name}}</ion-row>
+              <ion-row v-if="data.profiles[0]">{{ data.profiles[0].bio }}</ion-row>
+              <ion-row v-else>No Bio</ion-row>
+              <ion-row>{{ formatDate(data.created_on) }}</ion-row>
             </ion-col>
             <!-- <ion-col>3</ion-col> -->
           </ion-row>
         </ion-grid>
         <ion-card-header>
-
           <ion-card-title>{{ data.title }}</ion-card-title>
           <ion-card-subtitle>{{ data.liked.length }}</ion-card-subtitle>
         </ion-card-header>
@@ -193,6 +193,7 @@
   import { Preferences } from '@capacitor/preferences';
   import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
   import { ActionSheet, ActionSheetButtonStyle } from '@capacitor/action-sheet';
+  import moment from 'moment'
 
   // import { create, ellipsisHorizontal, ellipsisVertical, helpCircle, personCircle, search, star } from 'ionicons/icons';
 import { create, heart, thumbsDown, document, image} from 'ionicons/icons';
@@ -450,7 +451,7 @@ async function removeName(){
 async function getObject() {
   const ret = await Preferences.get({ key: 'token' });
   const user = JSON.parse(ret.value);
-  console.log(user)
+  // console.log(user)
   if (user != null){
     token.value = user.token_id
     user_id.value = user.id
@@ -522,11 +523,24 @@ async function showActions()  {
   console.log('Action Sheet result:', result);
 };
 
+
+function formatDate(value) {
+    if (value) {
+        return moment(String(value)).format('MMMM DD, YYYY [at] hh:mm a')
+    }
+};
+
 </script>
 
 
 
 <style>
+.user-info{
+  font-size: 11px;
+}
+.user-name{
+  font-size: 14px;
+}
 .heart {
   width: 15px;
   height: 15px;

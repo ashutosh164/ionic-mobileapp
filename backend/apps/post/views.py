@@ -12,17 +12,19 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from .models import Like, Comment
 from django.db.models import Q
+from rest_framework import filters
 
 
 class PostView(viewsets.ModelViewSet):
     serializer_class = PostSerializer
-    queryset = Posts.objects.all()
+    queryset = Posts.objects.all().order_by('-created_on')
+
     # authentication_classes = [TokenAuthentication]
     # permission_classes = [IsAuthenticated]
 
     # def get_queryset(self):
-    #     queryset = super(PostView, self).get_queryset()
-    #     pass
+        # queryset = super(PostView, self).get_queryset()
+        # return self.request.user
 
 
 class RegisterView(viewsets.ModelViewSet):

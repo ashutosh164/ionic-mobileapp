@@ -79,9 +79,19 @@ class PostSerializer(serializers.ModelSerializer):
     profiles = serializers.SerializerMethodField('get_profile_by_author_of_the_post')
 
     def get_profile_by_author_of_the_post(self, instance):
+        # print(*instance.liked.all().values_list('id'))
+        # print(self.context['request'].user)
+        user_liked = instance.liked.all().values_list('id')
+        print(list(user_liked))
+
+        # print(instance.liked.all())
+
         response = Profiles.objects.filter(post_id=instance.id).values()
-        print(response)
         return response
+
+    # def check_current_user_liked_post(self, instance):
+    #     liked_user = Like.objects.filter()
+    #     pass
 
     class Meta:
         model = Posts

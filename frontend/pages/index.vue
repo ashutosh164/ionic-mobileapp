@@ -81,10 +81,10 @@
 
 
     <div v-if="user_id">
-      <ion-card>{{ current_username }}
+      <ion-card>
         <ion-grid>
           <ion-row>
-            <ion-col >
+            <ion-col >{{ current_username }}-{{ user_id }}
                 <span class="relative inline-block">
                   <img class="h-10 w-10 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
                 </span>
@@ -92,12 +92,12 @@
             <ion-col size="10">
 
               <ion-row>
-                <ion-input class="input" label="What's happening?" label-placement="floating" fill="outline" ></ion-input>
+                <ion-input class="input" required v-model.trim="title" label="What's happening?" label-placement="floating" fill="outline" ></ion-input>
               </ion-row>
-              <ion-row>
+              <ion-row style="height:42px">
                 <ion-col size="1"><ion-icon class="h-6 w-6" :icon="image"></ion-icon></ion-col>
                 <ion-col size="7"><ion-icon class="h-6 w-6 ml-2" :icon="image"></ion-icon></ion-col>
-                <ion-col size="1"><ion-button class="h-6 w-16 font-semibold">Tweet</ion-button></ion-col>
+                <ion-col v-if="title" size="1"><ion-button class="h-6 w-16 font-semibold" @click="postTweet()">Tweet</ion-button></ion-col>
 
               </ion-row>
 
@@ -113,7 +113,7 @@
 
 
       <ion-card v-for="data in all_data" :key="data.id">
-        <ion-grid>
+        <ion-grid>{{ data.liked }} {{ current_username }}-- {{ user_id }}
           <ion-row>
             <ion-col >
                 <span class="relative inline-block">
@@ -123,7 +123,7 @@
             <ion-col class="user-info" size="10">
               <ion-row class="user-name font-bold" >{{data.user_name}}</ion-row>
               <ion-row v-if="data.profiles[0]">{{ data.profiles[0].bio }}</ion-row>
-              <ion-row v-else>No Bio</ion-row>
+              <!-- <ion-row v-else>No Bio</ion-row> -->
               <ion-row>{{ formatDate(data.created_on) }}</ion-row>
             </ion-col>
             <!-- <ion-col>3</ion-col> -->
@@ -131,7 +131,7 @@
         </ion-grid>
         <ion-card-header>
           <ion-card-title>{{ data.title }}</ion-card-title>
-          <ion-card-subtitle>{{ data.liked.length }}</ion-card-subtitle>
+          <!-- <ion-card-subtitle>{{ data.title }}</ion-card-subtitle> -->
         </ion-card-header>
        
 
@@ -139,12 +139,16 @@
 
 
         <ion-card-content>
-          <img style="width:100%" alt="Silhouette of mountains" :src="data.image" />
+          <img v-if="data.image != null" style="width:100%" alt="Silhouette of mountains" :src="data.image" />
 
           <ion-grid style="width:100%">
-          <ion-row class="ion-justify-content-center">
+          <ion-row class="ion-justify-content-center">{{ check_current_user_like_post }}
 
-              <ion-col v-if="data.liked.length && token != null" class="ion-justify-content-center">     
+              <ion-col v-if="check_current_user_like_post" class="ion-justify-content-center">     
+
+
+              <!-- <ion-col v-if="data.liked.length && token != null " class="ion-justify-content-center">      -->
+              <!-- <ion-col v-if="current_username== data.user_name && data.liked.length" class="ion-justify-content-center">      -->
                 <!-- <span @click="likePost(data.id)" class="rotate-45 "> -->
                 <span @click="likePost(data.id)" class="heart animate-heart mt-2" ></span>
                 <!-- <spam class="heart animate-ping mt-2 absolute inline-flex"></spam> -->
@@ -202,16 +206,41 @@ import { create, heart, thumbsDown, document, image} from 'ionicons/icons';
   const username = ref('')
   const user_id = ref('')
   const current_username = ref('')
+  const title = ref('')
+  const check_current_user_like_post = ref(false)
 
+  
+  // computed(()=> {
+  //   console.log(response.data.liked === user_id.value)
+  //   return response.data.liked === user_id.value
+
+  // })
+
+
+  // GET TOKEN DATA FROM CAPACITOR 
+async function getObject() {
+  const ret = await Preferences.get({ key: 'token' });
+  const user = JSON.parse(ret.value);
+  // console.log(user)
+  if (user != null){
+    token.value = user.token_id
+    user_id.value = user.id
+    current_username.value = user.current_username
+  }else{token.value = null}
+  // console.log(user.id)
+
+}
+getObject()
+  
 
 async function logOut(){
   await useFetch('http://127.0.0.1:8000/logout/')
   .then((response)=>{
-    console.log(response.data.value.Message)
-    if(response.data.value.Message){
-      LogoutToast('top')
+    // console.log(response.data.value.Message)
+    // if(response.data.value.Message){
+      // LogoutToast('top')
       token.value = null
-    }
+    // }
   })
   removeName()
 }
@@ -221,11 +250,88 @@ async function getData(){
       await useFetch('http://127.0.0.1:8000/posts/')
       .then((response)=>{
         console.log(response.data.value)
-        all_data.value = response.data.value
+        all_data.value = response.data.value 
+        const data = response.data.value
+        // console.log('hiiii',user_id.value)
+
+
+        if(response.data.value){
+          data.map((value, key) => {
+            // console.log(value.liked == user_id.value)
+            // console.log(value.liked)
+            const filter_data = value.liked
+            // console.log(filter_data)
+            // filter_data.map((value, key) =>{
+            //   console.log(value)
+            // })
+            // if (value.liked.length > 1){
+              // console.log(value.liked)
+
+            // }
+            
+            // if (value.liked[0] == user_id.value){
+            //   // check_current_user_like_post.value = true
+            // }
+
+          })
+        }
+const obj = {0: 3, 1: 2, 2: 5, 3: 1};
+
+// const filteredObj = Object.keys(obj).filter(key => obj[key] == user_id.value).reduce((result, key) => {
+//   result[key] = obj[key];
+//   return result;
+// }, {});
+
+// console.log(filteredObj);
+
+
+async function filteredObj(obj){
+  console.log('kjjjkjk')
+  Object.keys(obj).filter(key => obj[key] == user_id.value).reduce((result, key) => {
+  result[key] = obj[key];
+  console.log(result)
+  // return result;
+
+  
+}, {});
+}
+
+filteredObj(obj)
+      
       })
     }
 getData()
 
+// async function checkCurrentUserLikedPost(liked){
+//   console.log(liked.filter(checkLiked))
+// }
+// checkCurrentUserLikedPost()
+// function checkLiked(age) {
+//   return age == user_id.value;
+// }
+
+
+
+async function postTweet(){
+  let formData = new FormData();
+  formData.append('title', title.value)
+  formData.append('author', user_id.value)
+  console.log(title.value)
+
+  await useFetch('http://127.0.0.1:8000/posts/',{
+    body: formData,
+    method: 'POST'
+  })
+  .then((response)=>{
+    console.log(response)
+  })
+}
+
+
+function isEmpty(val){
+    return (val === undefined || val == null || val.length <= 0) ? true : false;
+}
+isEmpty(title.val)
     // let modal = document.querySelector('ion-modal');
 
     // console.log(modal)
@@ -334,6 +440,7 @@ const loginAlert = async () => {
                     if(response.data.value){
                       presentToastLogin('top')
                     }
+                    console.log(response.data.value.data)
                     current_username.value = response.data.value.data.username
                     console.log(response.data.value.data.username)
                     getData()
@@ -445,22 +552,6 @@ async function commentAlert(post_id){
 async function removeName(){
   await Preferences.remove({ key: 'token' });
 };
-
-
-// GET TOKEN DATA FROM CAPACITOR 
-async function getObject() {
-  const ret = await Preferences.get({ key: 'token' });
-  const user = JSON.parse(ret.value);
-  // console.log(user)
-  if (user != null){
-    token.value = user.token_id
-    user_id.value = user.id
-    current_username.value = user.current_username
-  }else{token.value = null}
-  // console.log(user.id)
-
-}
-getObject()
 
 
 

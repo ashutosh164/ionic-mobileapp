@@ -80,7 +80,7 @@
       
 
 
-    <div v-if="user_id">
+    <div>
       <ion-card>
         <ion-grid>
           <ion-row>
@@ -97,7 +97,11 @@
               <ion-row style="height:42px">
                 <ion-col size="1"><ion-icon class="h-6 w-6" :icon="image"></ion-icon></ion-col>
                 <ion-col size="7"><ion-icon class="h-6 w-6 ml-2" :icon="image"></ion-icon></ion-col>
-                <ion-col v-if="title" size="1"><ion-button class="h-6 w-16 font-semibold" @click="postTweet()">Tweet</ion-button></ion-col>
+                <!-- <ion-col v-if="title" size="1"><ion-button class="h-6 w-16 font-semibold" @click="postTweet()">Tweet</ion-button></ion-col> -->
+                <ion-col v-if="title" size="1">
+                  <ion-button v-if="user_id" class="h-6 w-16 font-semibold" @click="postTweet()">Tweet</ion-button>
+                  <ion-button v-else class="h-6 w-16 font-semibold" @click="loginAlert">Tweet</ion-button>
+                </ion-col>
 
               </ion-row>
 
@@ -113,7 +117,7 @@
 
 
       <ion-card v-for="data in all_data" :key="data.id">
-        <ion-grid>{{ data.liked }} {{ current_username }}-- {{ user_id }}
+        <ion-grid>
           <ion-row>
             <ion-col >
                 <span class="relative inline-block">
@@ -142,9 +146,9 @@
           <img v-if="data.image != null" style="width:100%" alt="Silhouette of mountains" :src="data.image" />
 
           <ion-grid style="width:100%">
-          <ion-row class="ion-justify-content-center">{{ check_current_user_like_post }}
+          <ion-row class="ion-justify-content-center">
 
-              <ion-col v-if="check_current_user_like_post" class="ion-justify-content-center">     
+              <ion-col v-if="data.check_user_like_post == user_id" class="ion-justify-content-center">     
 
 
               <!-- <ion-col v-if="data.liked.length && token != null " class="ion-justify-content-center">      -->
@@ -154,10 +158,15 @@
                 <!-- <spam class="heart animate-ping mt-2 absolute inline-flex"></spam> -->
                 
                 <!-- </span> -->
+
+            <ion-col class="ion-justify-content-center ml-5">{{data.total_like}}</ion-col>
+
             </ion-col>
+
             <ion-col v-else class="ion-justify-content-center mt-2">     
               <span class="heartless absolute inline-flex" @click="likePost(data.id)" ></span>
               <!-- <Icon   @click="unlikePost(data.id)" class="mt-3 rotate-45 heartless"   aria-hidden="true" /> -->
+              <ion-col class="ion-justify-content-center ml-5 ">{{data.total_like}}</ion-col>
 
 
             </ion-col>
@@ -169,12 +178,19 @@
             <ion-col class="ion-justify-content-center">
               <!-- <ion-icon :icon="create"  @click="commentAlert(data.id)"></ion-icon> -->
               <Icon name="heroicons-outline:chat-bubble-bottom-center" @click="commentAlert(data.id)" class="-ml-1 mr-2 h-7 w-7"   aria-hidden="true" />
+              <!-- <ion-col class="ion-justify-content-center ml-5">4444</ion-col> -->
+              <ion-col class="ion-justify-content-center -ml-2">5233</ion-col>
+
+
             </ion-col>
             <ion-col class="ion-justify-content-center">
-                <Icon name="heroicons-outline:paper-airplane"  @click="unlikePost(data.id)" class="-ml-1 mr-2 h-7 w-7 rotate-45"   aria-hidden="true" />
+                <Icon name="heroicons-outline:paper-airplane" class="-ml-1 mr-2 h-7 w-7 rotate-45"   aria-hidden="true" />
+                <ion-col class="ion-justify-content-center -ml-2">{{data.total_like}}</ion-col>
+
             </ion-col>
             <ion-col class="ion-justify-content-center">
                 <Icon name="heroicons:arrow-path-rounded-square-20-solid"  class="-ml-1 mr-2 h-7 w-7"   aria-hidden="true" />
+                <ion-col class="ion-justify-content-center -ml-2">{{data.total_like}}</ion-col>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -224,6 +240,7 @@ async function getObject() {
   // console.log(user)
   if (user != null){
     token.value = user.token_id
+    // console.log(user.token_id)
     user_id.value = user.id
     current_username.value = user.current_username
   }else{token.value = null}
@@ -240,14 +257,23 @@ async function logOut(){
     // if(response.data.value.Message){
       // LogoutToast('top')
       token.value = null
+      
+      // user_id.value = null
     // }
   })
   removeName()
+  loginAlert()
 }
 
 
 async function getData(){
-      await useFetch('http://127.0.0.1:8000/posts/')
+  // console.log(await Preferences.get({ key: 'token' }))
+  const ret = await Preferences.get({ key: 'token' });
+  const user = JSON.parse(ret.value);
+  if (user != null){
+    user_id.value = user.id
+  token.value = user.token_id
+      await useFetch('http://127.0.0.1:8000/posts/', {"headers": {"Authorization": 'Token ' + token.value}})
       .then((response)=>{
         console.log(response.data.value)
         all_data.value = response.data.value 
@@ -285,21 +311,25 @@ const obj = {0: 3, 1: 2, 2: 5, 3: 1};
 // console.log(filteredObj);
 
 
-async function filteredObj(obj){
-  console.log('kjjjkjk')
-  Object.keys(obj).filter(key => obj[key] == user_id.value).reduce((result, key) => {
-  result[key] = obj[key];
-  console.log(result)
-  // return result;
+// async function filteredObj(obj){
+//   console.log('kjjjkjk')
+//   Object.keys(obj).filter(key => obj[key] == user_id.value).reduce((result, key) => {
+//   result[key] = obj[key];
+//   console.log(result)
+//   return result;
 
   
-}, {});
-}
+// }, {});
+// }
+// async function filteredObj(liked_data){
+//   console.log(user_id.value)
+//   console.log(liked_data)
+// }
+// filteredObj()
 
-filteredObj(obj)
-      
+     
       })
-    }
+    }}
 getData()
 
 // async function checkCurrentUserLikedPost(liked){
@@ -320,10 +350,15 @@ async function postTweet(){
 
   await useFetch('http://127.0.0.1:8000/posts/',{
     body: formData,
-    method: 'POST'
+    method: 'POST',
+    headers: {"Authorization": 'Token ' + token.value}
+    
   })
   .then((response)=>{
     console.log(response)
+    title.value = null
+    getData()
+
   })
 }
 
@@ -443,9 +478,9 @@ const loginAlert = async () => {
                     console.log(response.data.value.data)
                     current_username.value = response.data.value.data.username
                     console.log(response.data.value.data.username)
-                    getData()
-
+                    
                     const auth_token = response.data.value.data.token
+                    
 
 
                     // SET DATA IN CAPACITOR
@@ -462,6 +497,7 @@ const loginAlert = async () => {
                       });
                     }
                     setObject()
+                    getData()
 
                       // JSON "get" example
                       // async function getObject() {
@@ -564,7 +600,8 @@ async function likePost(post_id){
     body: formData
   })
       .then((response)=>{
-        console.log(response.data.value)
+        // console.log(response.data.value)
+        getData()
       })
   }
 

@@ -20,7 +20,7 @@ class PostView(viewsets.ModelViewSet):
     queryset = Posts.objects.all().order_by('-created_on')
 
     # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     # def get_queryset(self):
         # queryset = super(PostView, self).get_queryset()

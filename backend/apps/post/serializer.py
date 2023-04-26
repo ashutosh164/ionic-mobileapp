@@ -73,25 +73,29 @@ class LikeSerializer(serializers.ModelSerializer):
 
 
 class PostSerializer(serializers.ModelSerializer):
-    # like = LikeSerializer(many=True, required=False)
-    # value = serializers.CharField(source='liked.value', read_only=True, required=False)
     user_name = serializers.CharField(source='author.username', read_only=True, required=False)
     profiles = serializers.SerializerMethodField('get_profile_by_author_of_the_post')
+    check_user_like_post = serializers.SerializerMethodField('check_current_user_liked_post')
+    total_like = serializers.SerializerMethodField('total_like_per_post')
 
     def get_profile_by_author_of_the_post(self, instance):
-        # print(*instance.liked.all().values_list('id'))
-        # print(self.context['request'].user)
-        user_liked = instance.liked.all().values_list('id')
-        print(list(user_liked))
-
-        # print(instance.liked.all())
-
         response = Profiles.objects.filter(post_id=instance.id).values()
         return response
 
-    # def check_current_user_liked_post(self, instance):
-    #     liked_user = Like.objects.filter()
-    #     pass
+    def check_current_user_liked_post(self, instance):
+        liked_data = list(instance.liked.values_list(flat=True))
+        print(liked_data)
+        user_id = self.context['request'].user.id
+        result = filter(lambda x: x == user_id, liked_data)
+        return result
+
+    def total_like_per_post(self, instance):
+        total = instance.liked.all().count()
+        return total
+
+    def total_comment_per_post(self, instance):
+        # total = instance
+        pass
 
     class Meta:
         model = Posts

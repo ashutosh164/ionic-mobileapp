@@ -179,7 +179,7 @@
               <!-- <ion-icon :icon="create"  @click="commentAlert(data.id)"></ion-icon> -->
               <Icon name="heroicons-outline:chat-bubble-bottom-center" @click="commentAlert(data.id)" class="-ml-1 mr-2 h-7 w-7"   aria-hidden="true" />
               <!-- <ion-col class="ion-justify-content-center ml-5">4444</ion-col> -->
-              <ion-col class="ion-justify-content-center -ml-2">5233</ion-col>
+              <ion-col class="ion-justify-content-center -ml-2">{{data.total_comment}}</ion-col>
 
 
             </ion-col>
@@ -571,7 +571,8 @@ async function commentAlert(post_id){
               method: 'POST',
               body: formData
             }).then((response)=>{
-              console.log(response)
+              // console.log(response)
+              getData()
             })
           }
           }

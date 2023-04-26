@@ -77,6 +77,7 @@ class PostSerializer(serializers.ModelSerializer):
     profiles = serializers.SerializerMethodField('get_profile_by_author_of_the_post')
     check_user_like_post = serializers.SerializerMethodField('check_current_user_liked_post')
     total_like = serializers.SerializerMethodField('total_like_per_post')
+    total_comment = serializers.SerializerMethodField('total_comment_per_post')
 
     def get_profile_by_author_of_the_post(self, instance):
         response = Profiles.objects.filter(post_id=instance.id).values()
@@ -84,7 +85,7 @@ class PostSerializer(serializers.ModelSerializer):
 
     def check_current_user_liked_post(self, instance):
         liked_data = list(instance.liked.values_list(flat=True))
-        print(liked_data)
+        # print(liked_data)
         user_id = self.context['request'].user.id
         result = filter(lambda x: x == user_id, liked_data)
         return result
@@ -94,8 +95,8 @@ class PostSerializer(serializers.ModelSerializer):
         return total
 
     def total_comment_per_post(self, instance):
-        # total = instance
-        pass
+        total = instance.comments.all().count()
+        return total
 
     class Meta:
         model = Posts

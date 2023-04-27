@@ -9,11 +9,49 @@
       </ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding">
-      
-      This is the menu content.
+      <ion-card>
+        <span v-for="data in all_data">
+
+          <img class="h-25 w-25 ml-auto mr-auto mt-2 rounded-full"  :src="data.current_user_profile[1]" />
+        </span>
+        <ion-card-header>
+          <ion-card-title class="text-center">{{ current_username }}</ion-card-title>
+          <!-- <ion-card-subtitle >Card Subtitle</ion-card-subtitle> -->
+        </ion-card-header>
+
+        <ion-card-content class="text-center">
+          Here's a small text description for the card content. Nothing more, nothing less.
+        </ion-card-content>
+        <ion-list>
+        <ion-item>
+          <ion-label>Followers</ion-label>
+          <ion-badge color="primary">22k</ion-badge>
+        </ion-item>
+        <ion-item>
+          <ion-label>Likes</ion-label>
+          <ion-badge color="secondary">118k</ion-badge>
+        </ion-item>
+        <ion-item>
+          <ion-label>Stars</ion-label>
+          <ion-badge color="tertiary">34k</ion-badge>
+        </ion-item>
+        <ion-item>
+          <ion-label>Completed</ion-label>
+          <ion-badge color="success">80</ion-badge>
+        </ion-item>
+        <ion-item>
+          <ion-label>Warnings</ion-label>
+          <ion-badge color="warning">70</ion-badge>
+        </ion-item>
+        <ion-item>
+          <ion-label>Notifications</ion-label>
+          <ion-badge color="danger">1000</ion-badge>
+        </ion-item>
+      </ion-list>
+      </ion-card>
 
 
-      <ion-list>
+      <!-- <ion-list>
     <ion-item>
       <ion-label>Followers</ion-label>
       <ion-badge color="primary">22k</ion-badge>
@@ -38,7 +76,7 @@
       <ion-label>Notifications</ion-label>
       <ion-badge color="danger">1000</ion-badge>
     </ion-item>
-  </ion-list>
+  </ion-list> -->
 
 
 
@@ -120,14 +158,16 @@
         <ion-grid>
           <ion-row>
             <ion-col >
-                <span class="relative inline-block">
-                  <img class="h-12 w-12 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
+                <span class="relative inline-block" >
+                  <!-- <img class="h-12 w-12 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" /> -->
+                  <img v-if="data.profiles_url != null" class="h-12 w-12 rounded-full" alt="" :src="data.profiles_url"/>
+                  
                 </span>
             </ion-col>
             <ion-col class="user-info" size="10">
               <ion-row class="user-name font-bold" >{{data.user_name}}</ion-row>
-              <ion-row v-if="data.profiles[0]">{{ data.profiles[0].bio }}</ion-row>
-              <!-- <ion-row v-else>No Bio</ion-row> -->
+              <ion-row v-if="data.profiles_details[0].bio">{{ data.profiles_details[0].bio }}</ion-row>
+              <ion-row v-else>No Bio</ion-row>
               <ion-row>{{ formatDate(data.created_on) }}</ion-row>
             </ion-col>
             <!-- <ion-col>3</ion-col> -->
@@ -138,9 +178,6 @@
           <!-- <ion-card-subtitle>{{ data.title }}</ion-card-subtitle> -->
         </ion-card-header>
        
-
-
-
 
         <ion-card-content>
           <img v-if="data.image != null" style="width:100%" alt="Silhouette of mountains" :src="data.image" />
@@ -257,6 +294,7 @@ async function logOut(){
     // if(response.data.value.Message){
       // LogoutToast('top')
       token.value = null
+      user_id.value = null
       
       // user_id.value = null
     // }
@@ -465,21 +503,21 @@ const loginAlert = async () => {
         {
             text: 'Submit',
             handler: (alertData) => { //takes the data 
-                console.log(alertData);
+                // console.log(alertData);
                 async function postData(){
                   await useFetch('http://127.0.0.1:8000/login/', {
                     method: 'POST',
                     body: alertData
                   }).then((response)=>{
-                    // console.log(response.data.value.data.user_id)
+                    console.log(response)
                     if(response.data.value){
                       presentToastLogin('top')
                     }
-                    console.log(response.data.value.data)
                     current_username.value = response.data.value.data.username
-                    console.log(response.data.value.data.username)
-                    
                     const auth_token = response.data.value.data.token
+                    // console.log(response.data.value.data)
+                    // console.log(response.data.value.data.username)
+                    
                     
 
 
@@ -572,7 +610,12 @@ async function commentAlert(post_id){
               body: formData
             }).then((response)=>{
               // console.log(response)
-              getData()
+              if(response.error.value){
+                  loginAlert()
+                }else{
+
+                  getData()
+                }
             })
           }
           }
@@ -600,10 +643,16 @@ async function likePost(post_id){
     method: 'POST',
     body: formData
   })
-      .then((response)=>{
-        // console.log(response.data.value)
+    .then((response)=>{
+      console.log(response)
+      if(response.error.value){
+        loginAlert()
+        console.log(response.error.value)
+      }
+
         getData()
-      })
+      
+    })
   }
 
 async function unlikePost(post_id){

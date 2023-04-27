@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from apps.account.models import Profiles
+from ..account.models import Profiles
 from django.contrib.auth.models import User
 
 

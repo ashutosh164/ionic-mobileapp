@@ -3,8 +3,12 @@ from .models import Posts, Like, Comment
 # from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+from django.conf import settings
+
+from ..account.serializers import ProfileSerializer
+
 User = get_user_model()
-from apps.account.models import Profiles
+from ..account.models import Profiles
 from rest_framework.response import Response
 
 
@@ -74,14 +78,38 @@ class LikeSerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source='author.username', read_only=True, required=False)
-    profiles = serializers.SerializerMethodField('get_profile_by_author_of_the_post')
+    profiles_url = serializers.SerializerMethodField('get_profile_by_author_of_the_post')
+    profiles_details = serializers.SerializerMethodField('get_profiles_details')
     check_user_like_post = serializers.SerializerMethodField('check_current_user_liked_post')
     total_like = serializers.SerializerMethodField('total_like_per_post')
     total_comment = serializers.SerializerMethodField('total_comment_per_post')
+    current_user_profile = serializers.SerializerMethodField('get_current_user_profiles_details')
 
     def get_profile_by_author_of_the_post(self, instance):
-        response = Profiles.objects.filter(post_id=instance.id).values()
+        profile = Profiles.objects.filter(user_id=instance.author.id).values_list('image', flat=True)
+        request = self.context.get('request')
+        # print(*profile)
+        # print(profile[0])
+        image_path = request.build_absolute_uri(settings.MEDIA_URL + profile[0])
+        return image_path
+
+    def get_profiles_details(self, instance):
+        response = Profiles.objects.filter(user_id=instance.author.id).values()
+        # print(response)
         return response
+
+    def get_current_user_profiles_details(self, instance):
+        user_id = self.context['request'].user.id
+        # print(user_id)
+        profile_obj = Profiles.objects.filter(user_id=user_id)
+        profile = profile_obj.values()
+        # print(profile)
+        request = self.context.get('request')
+        profile_image = profile_obj.values_list('image', flat=True)
+        image_url = request.build_absolute_uri(settings.MEDIA_URL + profile_image[0])
+        # print(image_url)
+
+        return profile, image_url
 
     def check_current_user_liked_post(self, instance):
         liked_data = list(instance.liked.values_list(flat=True))
